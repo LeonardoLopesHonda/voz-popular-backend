@@ -1,98 +1,158 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Voz Popular — Project Plan & API Contract
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Voz Popular** (Portuguese for _Popular Voice_) is a digital civic engagement platform designed to improve communication between citizens and the municipal government of **Ladário, Mato Grosso do Sul, Brazil**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Citizens use a mobile app to report urban issues — potholes, broken streetlights, waste disposal problems, infrastructure failures — attaching photos, descriptions, and GPS location data. Municipal administrators manage and respond to those reports through a web dashboard, tracking each report through a structured status workflow and keeping citizens informed on progress.
 
-## Description
+The platform acts as a portable, structured reporting channel between the population and the public administration — promoting transparency, civic participation, and faster resolution of urban problems.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+> Originally developed as a final undergraduate project (TCC) at IFMS – Campus Corumbá for the Technology in Systems Analysis and Development program. This repository represents a full backend migration and architectural redesign of the original Laravel prototype.
 
-## Project setup
+---
 
-```bash
-$ pnpm install
+## Stack
+
+| Layer            | Technology                                               |
+| ---------------- | -------------------------------------------------------- |
+| Mobile (Citizen) | Flutter · Dart                                           |
+| Backend API      | NestJS · TypeScript · Prisma                             |
+| Database         | PostgreSQL via Supabase                                  |
+| File Storage     | Supabase Storage                                         |
+| Admin Dashboard  | Next.js · React Leaflet                                  |
+| Deployment       | Railway (API) · Vercel (Admin) · Supabase (DB + Storage) |
+| Moderation       | Google Perspective API (text) · Sightengine (images)     |
+
+---
+
+> **Deadline:** End of March 2026
+> **Solo developer**
+
+---
+
+## Table of Contents
+
+1. [Milestones](#milestones)
+2. [Module Structure](#module-structure)
+3. [Tasks](#tasks)
+
+---
+
+## Milestones
+
+| #   | Milestone                                                           | Target         | Status |
+| --- | ------------------------------------------------------------------- | -------------- | ------ |
+| M1  | Schema finalized & Prisma migrations running on Supabase            | Week 1 Day 1–2 | ⬜     |
+| M2  | Auth endpoints working (register, login, logout, me)                | Week 1 Day 3–4 | ⬜     |
+| M3  | Core occurrence endpoints working (Flutter can submit & list)       | Week 1 Day 5–7 | ⬜     |
+| M4  | Comments & Updates endpoints working                                | Week 2 Day 1–2 | ⬜     |
+| M5  | Admin endpoints working (status update, sector mgmt)                | Week 2 Day 3–4 | ⬜     |
+| M6  | Moderation integrated (Perspective API + Sightengine)               | Week 2 Day 5–6 | ⬜     |
+| M7  | Flutter fully wired to new API (base URL swapped, all flows tested) | Week 2 Day 7   | ⬜     |
+| M8  | Admin Next.js panel live (map view + occurrence management)         | Week 3 Day 1–4 | ⬜     |
+| M9  | Deployment live (Railway + Supabase + Vercel)                       | Week 3 Day 5–6 | ⬜     |
+| M10 | Final QA & handoff                                                  | Week 3 Day 7   | ⬜     |
+
+---
+
+## Module Structure
+
+```
+src/
+├── auth/           # JWT strategy, login, register, logout
+├── users/          # Profile, me endpoint
+├── sectors/        # Sector CRUD (admin only)
+├── categories/     # Category reference data
+├── themes/         # Theme reference data
+├── occurrences/    # Core domain — submission, listing, status
+├── comments/       # Comments per occurrence
+├── updates/        # Admin workflow history per occurrence
+└── moderation/     # Perspective API + Sightengine integration
 ```
 
-## Compile and run the project
+## Tasks
 
-```bash
-# development
-$ pnpm run start
+### M1 — Schema & Database
 
-# watch mode
-$ pnpm run start:dev
+- [ ] Create Supabase project and grab `DATABASE_URL`
+- [ ] Bootstrap NestJS project with Prisma
+- [ ] Paste and validate `schema.prisma`
+- [ ] Run first migration (`prisma migrate dev`)
+- [ ] Seed categories and themes
 
-# production mode
-$ pnpm run start:prod
-```
+### M2 — Auth
 
-## Run tests
+- [ ] Install `@nestjs/jwt`, `bcrypt`, `passport-jwt`
+- [ ] Implement `AuthModule` with register, login, logout
+- [ ] Implement `JwtStrategy` and `JwtAuthGuard`
+- [ ] Implement `IsAdmin` guard for admin-only routes
+- [ ] Test auth flow end to end with Postman/Insomnia
 
-```bash
-# unit tests
-$ pnpm run test
+### M3 — Occurrences Core
 
-# e2e tests
-$ pnpm run test:e2e
+- [ ] Implement `OccurrencesModule`
+- [ ] POST `/occurrences` with multipart upload to Supabase Storage
+- [ ] Auto-generate title from theme + date
+- [ ] GET `/occurrences` with pagination and filters
+- [ ] GET `/occurrences/:id`
+- [ ] GET `/me/occurrences`
+- [ ] Wire `isOverdue` computed property on all occurrence responses
 
-# test coverage
-$ pnpm run test:cov
-```
+### M4 — Comments & Updates
 
-## Deployment
+- [ ] Implement `CommentsModule`
+- [ ] GET + POST `/occurrences/:id/comments`
+- [ ] Implement `UpdatesModule`
+- [ ] GET `/occurrences/:id/updates`
+- [ ] POST `/admin/occurrences/:id/updates`
+- [ ] Ensure status change via PATCH also auto-creates an Update record
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### M5 — Admin Endpoints
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+- [ ] PATCH `/admin/occurrences/:id/status`
+- [ ] Full `SectorsModule` CRUD
+- [ ] Category and Theme admin endpoints
+- [ ] Validate: admin cannot hard delete occurrences
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+### M6 — Moderation
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- [ ] Implement `ModerationModule`
+- [ ] Integrate Perspective API for comment and occurrence description text
+- [ ] Integrate Sightengine for occurrence image
+- [ ] Return 202 (flagged/under review) or 422 (rejected) correctly
+- [ ] Make moderation non-blocking on failure (external API down should not block submission)
 
-## Resources
+### M7 — Flutter Integration
 
-Check out a few resources that may come in handy when working with NestJS:
+- [ ] Swap base URL from `localhost:8000` to Railway deployment URL
+- [ ] Update Flutter field keys from Portuguese to English
+- [ ] Fix font registration (`SpoofTrial` → `Poppins` in pubspec.yaml)
+- [ ] Implement 401 interceptor in `ApiClient` (auto logout on token expiry)
+- [ ] Test all Flutter flows against new API: register, login, submit, list, detail, comment
+- [ ] Test on physical device (not emulator) for geolocation and camera
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### M8 — Admin Next.js Panel
 
-## Support
+- [ ] Scaffold Next.js project
+- [ ] Implement login page (admin only)
+- [ ] Implement occurrence map view with `react-leaflet`
+- [ ] Implement occurrence list with status filter
+- [ ] Implement occurrence detail + status update form
+- [ ] Implement sector management page
+- [ ] Implement polling for map updates (30s interval)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### M9 — Deployment
 
-## Stay in touch
+- [ ] Deploy NestJS API to Railway
+- [ ] Configure environment variables on Railway
+- [ ] Configure Supabase Storage bucket and public access rules
+- [ ] Deploy Next.js admin panel to Vercel
+- [ ] Update Flutter base URL to production Railway URL
+- [ ] Smoke test all three clients against production
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### M10 — Final QA
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- [ ] Full citizen flow: register → submit occurrence → track status → comment
+- [ ] Full admin flow: login → view map → update status → add update message
+- [ ] Verify moderation rejects toxic content
+- [ ] Verify `isOverdue` displays correctly on overdue occurrences
+- [ ] Confirm no hard delete paths exist in any client
