@@ -1,29 +1,47 @@
 import { Injectable } from '@nestjs/common';
-
-export type User = {
-    userId: number;
-    username: string;
-    password: string;
-}
-
-// FIXME: This is a mockup. Replace with a real database query
-// FIXME: Hash passwords.
-const users: User[] = [
-    {
-        userId: 1,
-        username: 'Anne',
-        password: 'Anne.123'
-    },
-    {
-        userId: 2,
-        username: 'Honda',
-        password: 'Honda.123'
-    },
-];
+import { UpdateUserDto } from './dto/update-user.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-    async findUserByUsername(username: string): Promise<User | undefined> {
-        return users.find((user) => user.username === username);
+  constructor(private prisma: PrismaService) {}
+
+  async findOne(userId: number) {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        isAdmin: true,
+        emailVerifiedAt: true,
+        createdAt: true,
+        sector: { select: { id: true, name: true } },
+      },
+    });
+  }
+
+  async update(userId: number, dto: UpdateUserDto) {
+    const data: any = { ...dto };
+
+    if (dto.password) {
+      // TODO: Update bcrypt hash to match environment (>14 - Production | 1 - Development)
+      data.password = await bcrypt.hash(dto.password, 10);
     }
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        isAdmin: true,
+        sector: { select: { id: true, name: true } },
+      },
+    });
+  }
 }

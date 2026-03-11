@@ -26,6 +26,7 @@ export class AuthService {
         throw new ConflictException('Email already in use');
       }
 
+      // TODO: Update bcrypt hash to match environment (>14 - Production | 1 - Development)
       const hashed = await bcrypt.hash(dto.password, 10);
 
       const user = await this.prisma.user.create({
