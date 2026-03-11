@@ -1,13 +1,38 @@
-import { Body, Controller, HttpCode, HttpStatus, NotImplementedException, Post } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { CurrentUser } from '../common/docorators/current-user.decorator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-    @HttpCode(HttpStatus.OK)
-    @Post('login')
-    login(@Body() input: { username: string; password: string }) {
-        return this.authService.authenticate(input);
-    }
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @Post('login')
+  @HttpCode(HttpStatus.OK)
+  login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  logout(@CurrentUser() user: any) {
+    // Possibility to implement token blacklisting, for that use Redis' denylist
+    return { message: 'Logged out successfully' };
+  }
 }

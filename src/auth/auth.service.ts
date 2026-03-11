@@ -1,53 +1,73 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { User, UsersService } from '../users/users.service';
-
-type AuthInput = {
-    username: string;
-    password: string;
-}
-
-type AuthResult = {
-    accessToken: string;
-    userId: number;
-    username: string;
-}
-
-type SignInData = {
-    userId: number;
-    username: string;
-}
+import { JwtService } from '@nestjs/jwt';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-    constructor(private usersService: UsersService) {}
+  constructor(
+    private prisma: PrismaService,
+    private jwt: JwtService,
+  ) {}
 
-    async authenticate(input: AuthInput): Promise<AuthResult> {
-        const user = await this.validateUser(input);
+  async register(dto: RegisterDto) {
+    try {
+      const existing = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
 
-        if(!user) throw new UnauthorizedException();
+      if (existing) {
+        throw new ConflictException('Email already in use');
+      }
 
-        return {
-            accessToken: "fake-token",
-            userId: user.userId,
-            username: user.username
-        }
+      const hashed = await bcrypt.hash(dto.password, 10);
+
+      const user = await this.prisma.user.create({
+        data: {
+          name: dto.name,
+          email: dto.email,
+          password: hashed,
+        },
+        include: { sector: true },
+      });
+
+      const { password, ...safeUser } = user;
+      const token = this.signToken(user.id, user.email);
+
+      return { token, user: safeUser };
+    } catch (error) {
+      throw error;
     }
+  }
 
-    private validatePassword(input: AuthInput, user: User): SignInData | null {
-        if(user.password === input.password) {
-            return {
-                userId: user.userId,
-                username: user.username,
-            }
-        }
-        return null;
-    }
+  async login(dto: LoginDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+        include: { sector: true },
+      });
 
-    async validateUser(input: AuthInput): Promise<SignInData | null> {
-        const user = await this.usersService.findUserByUsername(input.username);
-        // FIXME: 204 (No Content) - User not found custom error
-        // FIXME: 400 (Bad Request) - Wrong parameters custom error
-        if(!user) return null
-        return this.validatePassword(input, user);
+      if (!user) throw new UnauthorizedException('Credenciais inválidas');
+
+      const valid = await bcrypt.compare(dto.password, user.password);
+      if (!valid) throw new UnauthorizedException('Credenciais inválidas');
+
+      const { password, ...safeUser } = user;
+      const token = this.signToken(user.id, user.email);
+
+      return { token, user: safeUser };
+    } catch (error) {
+      throw error;
     }
+  }
+
+  private signToken(userId: number, email: string): string {
+    return this.jwt.sign({ sub: userId, email });
+  }
 }
