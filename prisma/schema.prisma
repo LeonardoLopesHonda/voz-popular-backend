@@ -57,7 +57,7 @@ model User {
   bio             String?
   isAdmin         Boolean   @default(false) @map("is_admin")
   provider        Provider? @default(LOCAL)
-  providerId      Int?      @map("provider_id")
+  providerId      String?      @map("provider_id")
   emailVerifiedAt DateTime? @map("email_verified_at")
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
