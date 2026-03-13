@@ -20,9 +20,6 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": false,
-    "baseUrl": "./",
-    "paths": {
-      "@prisma-client/*": ["generated/prisma/*"]
-    }
+    "baseUrl": "./"
   }
 }
