@@ -16,7 +16,7 @@ export class SectorsService {
   }
 
   update(id: number, dto: UpdateSectorDto) {
-    return this.prisma.sector.update({ where: { name: 'asc' } });
+    return this.prisma.sector.update({ where: { id }, data: dto });
   }
 
   remove(id: number) {
