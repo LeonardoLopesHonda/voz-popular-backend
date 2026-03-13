@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client/extension';
+import { PrismaClient } from '@prisma-client/client';
 
 @Injectable()
 export class PrismaService
@@ -10,6 +10,7 @@ export class PrismaService
     try {
       await this.$connect();
     } catch (error) {
+      console.log('Não funciona');
       throw new InternalServerError({
         cause: 'Falha ao conectar com banco de dados',
         statusCode: 500,
