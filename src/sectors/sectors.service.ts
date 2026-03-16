@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSectorDto } from './dto/create-sector.dto';
-import { UpdateSectorDto } from './dto/update-sector.dto';
+import { CreateSectorDto, UpdateSectorDto } from './dto/sector.dto';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()

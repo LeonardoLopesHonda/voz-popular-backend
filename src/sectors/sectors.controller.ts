@@ -9,8 +9,7 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { SectorsService } from './sectors.service';
-import { CreateSectorDto } from './dto/create-sector.dto';
-import { UpdateSectorDto } from './dto/update-sector.dto';
+import { CreateSectorDto, UpdateSectorDto } from './dto/sector.dto';
 
 @Controller('sectors')
 export class SectorsController {

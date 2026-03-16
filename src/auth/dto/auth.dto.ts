@@ -8,3 +8,14 @@ export class LoginDto {
   @MinLength(8)
   password: string;
 }
+
+export class RegisterDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+}
